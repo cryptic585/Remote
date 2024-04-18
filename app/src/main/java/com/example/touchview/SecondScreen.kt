@@ -19,18 +19,22 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -57,7 +61,6 @@ import kotlinx.coroutines.launch
 import java.io.DataOutputStream
 import java.net.Socket
 
-
 @Composable
 fun SecondScreen(navController: NavHostController, text: String) {
 
@@ -83,11 +86,16 @@ fun SecondScreen(navController: NavHostController, text: String) {
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
                 onClick = { showDialog = true },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .height(50.dp) // Fixed height for all buttons
+                    .weight(1f), // Fill available space
+                shape = customButtonShape,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
             ) {
                 Text("Shortcuts")
             }
@@ -116,13 +124,21 @@ fun SecondScreen(navController: NavHostController, text: String) {
 
             Button(
                 onClick = { screenshot(ipAddress) },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .height(50.dp) // Fixed height for all buttons
+                    .weight(1f), // Fill available space
+                shape = customButtonShape,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
             ) {
                 Text("Screenshot")
             }
             Button(
                 onClick = { showKeyboard(context, ipAddress) },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .height(50.dp) // Fixed height for all buttons
+                    .weight(1f), // Fill available space
+                shape = customButtonShape,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
             ) {
                 Text("Keyboard")
             }
@@ -153,8 +169,7 @@ fun SecondScreen(navController: NavHostController, text: String) {
             modifier = Modifier
                 //.weight(1f)
                 .height(100.dp) // Set the height to be small
-                .background(Color.Transparent)
-                .padding(top = 16.dp), // Add padding to adjust the position from the top
+                .background(Color.Transparent),
             //.aspectRatio(1f),
             contentAlignment = Alignment.Center
 
@@ -178,51 +193,62 @@ fun SecondScreen(navController: NavHostController, text: String) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .height(150.dp)
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top // Align buttons at the top
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start, // Align buttons to start and end
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Left click button
+                Button(
+                    onClick = { leftClick(ipAddress) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    shape = customButtonShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
                 ) {
-                    // First row with three buttons
-                    Button(
-                        onClick = { leftClick(ipAddress) },
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-                    ) {
-                        Text("Left Click")
-                    }
+                    Text("Left Click")
+                }
+
+                // Scroll up, scroll down buttons arranged in a column
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                ) {
                     Button(
                         onClick = { scrollUp(ipAddress) },
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-
+                        modifier = Modifier
+                            .fillMaxWidth().height(IntrinsicSize.Max).weight(1f),
+                        shape = customButtonShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
                     ) {
                         Text("Scroll Up")
                     }
                     Button(
-                        onClick = { rightClick(ipAddress) },
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-                    ) {
-                        Text("Right Click")
-                    }
-                }
-
-                // Second row with one button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.Bottom // Align button at the bottom
-                ) {
-                    Button(
                         onClick = { scrollDown(ipAddress) },
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth().height(IntrinsicSize.Max).weight(1f),
+                        shape = customButtonShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
                     ) {
                         Text("Scroll Down")
                     }
                 }
+
+                // Right click button
+                Button(
+                    onClick = { rightClick(ipAddress) },
+                    modifier = Modifier
+                        .weight(1f).fillMaxHeight(),
+                    shape = customButtonShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
+                ) {
+                    Text("Right Click")
+                }
             }
         }
+
 
 
     }
@@ -234,7 +260,7 @@ fun TouchView2(onTap: () -> Unit, onDoubleTap: () -> Int, ipAddress: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.DarkGray)
+            .background(Color(192, 153, 153))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onDoubleTap = {
@@ -250,7 +276,12 @@ fun TouchView2(onTap: () -> Unit, onDoubleTap: () -> Int, ipAddress: String) {
 
                     }
                 )
-            })
+            }){
+        Text(
+            text = "Tap or Double Tap",
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
 
 }
 
@@ -263,7 +294,7 @@ fun TouchView(onTouch: (x: Float, y: Float) -> Unit, ipAddress: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.LightGray)
+            .background(Color(0xFFFFEFD5))
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     onTouch(dragAmount.x, dragAmount.y)
@@ -273,7 +304,12 @@ fun TouchView(onTouch: (x: Float, y: Float) -> Unit, ipAddress: String) {
 
 
             }
-    )
+    ){
+        Text(
+            text = "Mouse",
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
 }
 
 
