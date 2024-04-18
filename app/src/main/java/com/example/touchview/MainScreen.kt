@@ -28,10 +28,10 @@ import java.net.Socket
 
 // Define a custom shape for the buttons
 val customButtonShape = RoundedCornerShape(
-    topStart = CornerSize(0.dp),
-    topEnd = CornerSize(0.dp),
-    bottomStart = CornerSize(0.dp),
-    bottomEnd = CornerSize(0.dp)
+    topStart = CornerSize(1.dp),
+    topEnd = CornerSize(1.dp),
+    bottomStart = CornerSize(1.dp),
+    bottomEnd = CornerSize(1.dp)
 )
 
 @Composable
@@ -61,7 +61,7 @@ fun MainScreen(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(horizontal = 0.dp)
                 .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(4.dp))
-                .padding(vertical = 22.dp, horizontal = 12.dp)
+                .padding(vertical = 24.dp, horizontal = 16.dp)
         )
 
         // Button with brown color and more padding
@@ -87,7 +87,7 @@ fun MainScreen(navController: NavHostController) {
 fun connect(navController: NavHostController, context: android.content.Context, currentTextFieldValue: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = currentTextFieldValue.trim()
-        val port = 1234
+        val port = 7777
         try {
             val socket = Socket(ipAddress, port)
             val outToServer = DataOutputStream(socket.getOutputStream())
