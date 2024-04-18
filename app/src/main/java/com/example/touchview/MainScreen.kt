@@ -36,7 +36,7 @@ val customButtonShape = RoundedCornerShape(
 
 @Composable
 fun MainScreen(navController: NavHostController) {
-    var text by remember { mutableStateOf(TextFieldValue("192.168.2.13")) }
+    var text by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
 
     Column(
