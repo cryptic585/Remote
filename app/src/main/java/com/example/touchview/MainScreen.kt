@@ -36,7 +36,7 @@ val customButtonShape = RoundedCornerShape(
 
 @Composable
 fun MainScreen(navController: NavHostController) {
-    var text by remember { mutableStateOf(TextFieldValue("")) }
+    var text by remember { mutableStateOf(TextFieldValue("192.158.1.38.")) }
     val context = LocalContext.current
 
     Column(
@@ -61,7 +61,7 @@ fun MainScreen(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(horizontal = 0.dp)
                 .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(4.dp))
-                .padding(vertical = 20.dp, horizontal = 12.dp)
+                .padding(vertical = 22.dp, horizontal = 12.dp)
         )
 
         // Button with brown color and more padding

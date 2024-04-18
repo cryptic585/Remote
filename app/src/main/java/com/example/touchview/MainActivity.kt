@@ -80,19 +80,19 @@ fun MyApp() {
         ) {
             Button(
                 onClick = { shortcuts() },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 9.dp)
             ) {
                 Text("Shortcuts")
             }
             Button(
                 onClick = { screenshot() },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 9.dp)
             ) {
                 Text("Screenshot")
             }
             Button(
                 onClick = { showKeyboard(context) },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 9.dp)
             ) {
                 Text("Keyboard")
             }
