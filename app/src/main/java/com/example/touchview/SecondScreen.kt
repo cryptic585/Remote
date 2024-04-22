@@ -11,6 +11,7 @@ import android.widget.EditText
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -21,13 +22,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,6 +55,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -100,16 +107,80 @@ fun SecondScreen(navController: NavHostController, text: String) {
                 Text("Shortcuts")
             }
             if (showDialog) {
-                /*AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text(text = "Popup Title") },
-                    text = { Text(text = "Popup message.") },
-                    confirmButton = {
-                        Button(onClick = { showDialog = false }) {
-                            Text(text = "OK")
+                Dialog(
+                    onDismissRequest = {
+                        // Hide the dialog when dismissed
+                        showDialog = false
+                    },
+                    properties = DialogProperties()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .widthIn(max = 400.dp) // Adjust max width as needed
+                            .heightIn(max = 400.dp) // Adjust max height as needed
+                            .background(Color.DarkGray) // Dark background color
+                            .padding(16.dp) // Padding inside the dialog
+                            .border(2.dp, Color.White)
+                    ) {
+                    // Content of the dialog
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth() // Customize the size by changing the width
+                            .wrapContentHeight()
+                    ) {
+                        // Different buttons in the dialog
+                        Button(
+                            onClick = {
+                                // Add your button click action here
+                                      desktop(ipAddress)
+                            },
+                            modifier = Modifier.fillMaxWidth() // Customize the button width
+                        ) {
+                            Text("Desktop")
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = {
+                                // Add your button click action here
+                                      terminal(ipAddress)
+                            },
+                            modifier = Modifier.fillMaxWidth() // Customize the button width
+                        ) {
+                            Text("Terminal")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = {
+                                // Add your button click action here
+                                      notes(ipAddress)
+                            },
+                            modifier = Modifier.fillMaxWidth() // Customize the button width
+                        ) {
+                            Text("Notes")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = {
+                                // Add your button click action here
+                                      calculator(ipAddress)
+                            },
+                            modifier = Modifier.fillMaxWidth() // Customize the button width
+                        ) {
+                            Text("Calculator")
+                        }
+
+
+                        // Add more buttons as needed
                     }
-                )*/
+                }
+                }
+            }
+            /*if (showDialog) {
+
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = { Text(text = "Popup Title") },
@@ -120,7 +191,7 @@ fun SecondScreen(navController: NavHostController, text: String) {
                         }
                     }
                 )
-            }
+            }*/
 
             Button(
                 onClick = { screenshot(ipAddress) },
@@ -525,6 +596,60 @@ fun scrollDown(ipAddress: String){
 }
 
 
-fun shortcuts(ipAddress: String){
-
+fun desktop(ipAddress: String){
+    GlobalScope.launch(Dispatchers.IO) {
+        val ipAddress = ipAddress
+        val port = 1234
+        try {
+            val socket = Socket(ipAddress, port)
+            val outToServer = DataOutputStream(socket.getOutputStream())
+            outToServer.writeUTF("10")
+            socket.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
+fun terminal(ipAddress: String){
+    GlobalScope.launch(Dispatchers.IO) {
+        val ipAddress = ipAddress
+        val port = 1234
+        try {
+            val socket = Socket(ipAddress, port)
+            val outToServer = DataOutputStream(socket.getOutputStream())
+            outToServer.writeUTF("11")
+            socket.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+fun notes(ipAddress: String){
+    GlobalScope.launch(Dispatchers.IO) {
+        val ipAddress = ipAddress
+        val port = 1234
+        try {
+            val socket = Socket(ipAddress, port)
+            val outToServer = DataOutputStream(socket.getOutputStream())
+            outToServer.writeUTF("12")
+            socket.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+fun calculator(ipAddress: String){
+    GlobalScope.launch(Dispatchers.IO) {
+        val ipAddress = ipAddress
+        val port = 1234
+        try {
+            val socket = Socket(ipAddress, port)
+            val outToServer = DataOutputStream(socket.getOutputStream())
+            outToServer.writeUTF("13")
+            socket.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
