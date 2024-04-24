@@ -3,9 +3,11 @@ package com.example.touchview
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -14,10 +16,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -39,50 +47,115 @@ fun MainScreen(navController: NavHostController) {
     var text by remember { mutableStateOf(TextFieldValue("192.168.2.13")) }
     val context = LocalContext.current
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF100c08),
+                        Color(0xFF000036),
+                        Color(0xFF003153)
+                    )
+                )
+            )
+            .padding(horizontal = 16.dp)
     ) {
-        // Main heading
-        Text(
-            text = "Enter IP Address",
-            style = MaterialTheme.typography.displayMedium,
-            modifier = Modifier.padding(bottom = 50.dp)
-        )
-
-        // BasicTextField with black border and shadow
-        BasicTextField(
-            value = text,
-            onValueChange = { newText -> text = newText },
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Image(
+                    painter = painterResource(id = R.drawable.logo_image),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.padding(vertical = 15.dp, horizontal = 0.dp)
+                )
+            }
+            item {
+                HeaderText()
+            }
+            item {
+                Divider(
+                    color = Color.LightGray,
+                    thickness = 2.dp,
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(horizontal = 15.dp, vertical = 40.dp)
+                )
+            }
+            item {
+                BasicTextField(
+                    value = text,
+                    onValueChange = { newText -> text = newText },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp, horizontal = 12.dp)
+                        .border(
+                            width = 2.dp,
+                            color = Color.White, // White border color
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                        .padding(horizontal = 10.dp, vertical = 20.dp)
+                        .shadow(20.dp, shape = RoundedCornerShape(4.dp)) // Add shadow
+                        .padding(horizontal = 12.dp), // Adjust padding after applying shadow
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White, fontSize = 25.sp)
+                )
+            }
+        }
+        FloatingActionButton(
+            onClick = { navController.navigate("about_screen") },
+            contentColor = Color.White,
+            containerColor = Color(0xFFF79256),
+            shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 20.dp
+            ),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 0.dp)
-                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(4.dp))
-                .padding(vertical = 20.dp, horizontal = 12.dp)
-        )
-
-        // Button with brown color and more padding
-        Button(
-            onClick = {
-                connect(navController, context, text.text)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            shape = customButtonShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513)) // Set background color
+                .padding(16.dp)
+                .align(Alignment.BottomStart)
         ) {
             Text(
-                "Start Remote Controller",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(vertical = 10.dp)
+                text = "About",
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp),
+                modifier = Modifier.padding(vertical = 35.dp, horizontal = 20.dp)
+            )
+        }
+        FloatingActionButton(
+            onClick = { connect(navController, context, text.text) },
+            contentColor = Color.White,
+            containerColor = Color(0xFF007bb8),
+            shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 20.dp
+            ),
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd)
+        ) {
+            Text(
+                text = "Go",
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp),
+                modifier = Modifier.padding(vertical = 35.dp, horizontal = 35.dp)
             )
         }
     }
 }
+
+@Composable
+fun HeaderText() {
+    Text(
+        text = "IP Address Information ",
+        style = MaterialTheme.typography.displayLarge.copy(
+            fontSize = 60.sp,
+        ),
+        color = Color(0xFFF79256),
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 50.dp, bottom = 0.dp).padding(horizontal = 15.dp)
+    )
+}
+
 
 fun connect(navController: NavHostController, context: android.content.Context, currentTextFieldValue: String) {
     GlobalScope.launch(Dispatchers.IO) {
