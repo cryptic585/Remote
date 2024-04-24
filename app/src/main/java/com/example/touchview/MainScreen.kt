@@ -1,6 +1,7 @@
 package com.example.touchview
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -39,7 +40,7 @@ fun MainScreen(navController: NavHostController) {
     var text by remember { mutableStateOf(TextFieldValue("192.168.2.13")) }
     val context = LocalContext.current
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -51,10 +52,10 @@ fun MainScreen(navController: NavHostController) {
                     )
                 )
             )
-            .padding(horizontal = 16.dp)
+//            .padding(horizontal = 16.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
@@ -96,45 +97,45 @@ fun MainScreen(navController: NavHostController) {
                 )
             }
         }
-        FloatingActionButton(
+        Buttons(navController, context, text.text)
+    }
+}
+
+@Composable
+fun Buttons(navController: NavHostController, context: Context, text: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Button(
             onClick = { navController.navigate("about_screen") },
-            contentColor = Color.White,
-            containerColor = Color(0xFFF79256),
-            shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
-            elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 20.dp
-            ),
             modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomStart)
+                .height(70.dp).weight(1f), // Fill available space
+            shape = customButtonShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF79256))
         ) {
             Text(
                 text = "About",
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp),
-                modifier = Modifier.padding(vertical = 35.dp, horizontal = 20.dp)
-            )
+
+                )
         }
-        FloatingActionButton(
-            onClick = { connect(navController, context, text.text) },
-            contentColor = Color.White,
-            containerColor = Color(0xFF007bb8),
-            shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
-            elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 20.dp
-            ),
+        Button(
+            onClick = { connect(navController, context, text) },
             modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomEnd)
+                .height(70.dp).weight(1f), // Fill available space
+            shape = customButtonShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007bb8))
         ) {
             Text(
                 text = "Go",
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp),
-                modifier = Modifier.padding(vertical = 35.dp, horizontal = 35.dp)
-            )
+
+                )
         }
     }
 }
-
 @Composable
 fun HeaderText() {
     Text(
