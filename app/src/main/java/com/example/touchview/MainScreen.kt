@@ -34,14 +34,6 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
 
-// Define a custom shape for the buttons
-val customButtonShape = RoundedCornerShape(
-    topStart = CornerSize(0.dp),
-    topEnd = CornerSize(0.dp),
-    bottomStart = CornerSize(0.dp),
-    bottomEnd = CornerSize(0.dp)
-)
-
 @Composable
 fun MainScreen(navController: NavHostController) {
     var text by remember { mutableStateOf(TextFieldValue("192.168.2.13")) }
