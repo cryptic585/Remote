@@ -1,6 +1,7 @@
 package com.example.touchview
 
 import android.app.Activity
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -65,6 +66,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
 
@@ -75,20 +78,11 @@ fun SecondScreen(navController: NavHostController, text: String) {
     val focusManager = LocalFocusManager.current
     var isPopupVisible by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var screenshotFileName by remember { mutableStateOf<String?>(null) }
 
-
-    //val navBackStackEntry by navController.currentBackStackEntryAsState()
-    //val ipAddress = navBackStackEntry?.arguments?.getString("text") ?: ""
-    //val ipAddress = "10.0.0.63"
     val ipAddress = text.trim()
 
-
     println("ipAddress: $ipAddress")
-
-    //val ipAddress = navBackStackEntry.arguments?.getString("text") ?: ""
-
-
-
 
     Column {
         Row(
@@ -122,79 +116,73 @@ fun SecondScreen(navController: NavHostController, text: String) {
                             .padding(16.dp) // Padding inside the dialog
                             .border(2.dp, Color.White)
                     ) {
-                    // Content of the dialog
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth() // Customize the size by changing the width
-                            .wrapContentHeight()
-                    ) {
-                        // Different buttons in the dialog
-                        Button(
-                            onClick = {
-                                // Add your button click action here
-                                      desktop(ipAddress)
-                            },
-                            modifier = Modifier.fillMaxWidth() // Customize the button width
+                        // Content of the dialog
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth() // Customize the size by changing the width
+                                .wrapContentHeight()
                         ) {
-                            Text("Desktop")
+                            // Different buttons in the dialog
+                            Button(
+                                onClick = {
+                                    // Add your button click action here
+                                    desktop(ipAddress)
+                                },
+                                modifier = Modifier.fillMaxWidth() // Customize the button width
+                            ) {
+                                Text("Desktop")
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Button(
+                                onClick = {
+                                    // Add your button click action here
+                                    terminal(ipAddress)
+                                },
+                                modifier = Modifier.fillMaxWidth() // Customize the button width
+                            ) {
+                                Text("Terminal")
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Button(
+                                onClick = {
+                                    // Add your button click action here
+                                    notes(ipAddress)
+                                },
+                                modifier = Modifier.fillMaxWidth() // Customize the button width
+                            ) {
+                                Text("Notes")
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Button(
+                                onClick = {
+                                    // Add your button click action here
+                                    calculator(ipAddress)
+                                },
+                                modifier = Modifier.fillMaxWidth() // Customize the button width
+                            ) {
+                                Text("Calculator")
+                            }
+
+
+                            // Add more buttons as needed
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            onClick = {
-                                // Add your button click action here
-                                      terminal(ipAddress)
-                            },
-                            modifier = Modifier.fillMaxWidth() // Customize the button width
-                        ) {
-                            Text("Terminal")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            onClick = {
-                                // Add your button click action here
-                                      notes(ipAddress)
-                            },
-                            modifier = Modifier.fillMaxWidth() // Customize the button width
-                        ) {
-                            Text("Notes")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            onClick = {
-                                // Add your button click action here
-                                      calculator(ipAddress)
-                            },
-                            modifier = Modifier.fillMaxWidth() // Customize the button width
-                        ) {
-                            Text("Calculator")
-                        }
-
-
-                        // Add more buttons as needed
                     }
-                }
                 }
             }
-            /*if (showDialog) {
-
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text(text = "Popup Title") },
-                    text = { Text(text = "Popup message.") },
-                    confirmButton = {
-                        Button(onClick = { showDialog = false }) {
-                            Text(text = "OK")
-                        }
-                    }
-                )
-            }*/
 
             Button(
-                onClick = { screenshot(ipAddress) },
+                onClick = {
+                    GlobalScope.launch {
+                        val fileName = screenshot(ipAddress)
+                        if (fileName != null) {
+                            screenshotFileName = fileName
+                        }
+                    }
+                },
                 modifier = Modifier
                     .height(50.dp) // Fixed height for all buttons
                     .weight(1f), // Fill available space
@@ -203,6 +191,33 @@ fun SecondScreen(navController: NavHostController, text: String) {
             ) {
                 Text("Screenshot")
             }
+
+            if (screenshotFileName != null) {
+                AlertDialog(
+                    onDismissRequest = {
+                        screenshotFileName = null
+                    },
+                    title = {
+                        Text("Screenshot Saved")
+                    },
+                    text = {
+                        val message = screenshotFileName
+                        if (message != null) {
+                            Text(message)
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                screenshotFileName = null
+                            }
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                )
+            }
+
             Button(
                 onClick = { showKeyboard(context, ipAddress) },
                 modifier = Modifier
@@ -219,7 +234,6 @@ fun SecondScreen(navController: NavHostController, text: String) {
         Box(
             modifier = Modifier
                 .weight(1f)
-                //.height(100.dp) // Set the height to be small
                 .background(Color.Transparent),
             //.aspectRatio(1f),
             contentAlignment = Alignment.Center
@@ -234,7 +248,7 @@ fun SecondScreen(navController: NavHostController, text: String) {
                 ipAddress
 
 
-                )
+            )
         }
         Box(
             modifier = Modifier
@@ -247,17 +261,11 @@ fun SecondScreen(navController: NavHostController, text: String) {
         ) {
             TouchView2(
                 onTap = {
-
-
                 },
                 onDoubleTap = {
-
-
                     Log.d("onDoubleTap", "onDoubleTap")
                 },
                 ipAddress,
-
-
                 )
         }
 
@@ -285,12 +293,16 @@ fun SecondScreen(navController: NavHostController, text: String) {
 
                 // Scroll up, scroll down buttons arranged in a column
                 Column(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                 ) {
                     Button(
                         onClick = { scrollUp(ipAddress) },
                         modifier = Modifier
-                            .fillMaxWidth().height(IntrinsicSize.Max).weight(1f),
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Max)
+                            .weight(1f),
                         shape = customButtonShape,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
                     ) {
@@ -299,7 +311,9 @@ fun SecondScreen(navController: NavHostController, text: String) {
                     Button(
                         onClick = { scrollDown(ipAddress) },
                         modifier = Modifier
-                            .fillMaxWidth().height(IntrinsicSize.Max).weight(1f),
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Max)
+                            .weight(1f),
                         shape = customButtonShape,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
                     ) {
@@ -311,7 +325,8 @@ fun SecondScreen(navController: NavHostController, text: String) {
                 Button(
                     onClick = { rightClick(ipAddress) },
                     modifier = Modifier
-                        .weight(1f).fillMaxHeight(),
+                        .weight(1f)
+                        .fillMaxHeight(),
                     shape = customButtonShape,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B4513))
                 ) {
@@ -319,7 +334,6 @@ fun SecondScreen(navController: NavHostController, text: String) {
                 }
             }
         }
-
 
 
     }
@@ -347,15 +361,13 @@ fun TouchView2(onTap: () -> Unit, onDoubleTap: () -> Int, ipAddress: String) {
 
                     }
                 )
-            }){
+            }) {
         Text(
             text = "Tap or Double Tap",
             modifier = Modifier.align(Alignment.Center)
         )
     }
-
 }
-
 
 @Composable
 fun TouchView(onTouch: (x: Float, y: Float) -> Unit, ipAddress: String) {
@@ -372,10 +384,8 @@ fun TouchView(onTouch: (x: Float, y: Float) -> Unit, ipAddress: String) {
                     Log.d("TouchView", "DeltaX: ${dragAmount.x}, DeltaY: ${dragAmount.y}")
                     sendCoordinatesToServer(dragAmount.x, dragAmount.y, ipAddress)
                 }
-
-
             }
-    ){
+    ) {
         Text(
             text = "Mouse",
             modifier = Modifier.align(Alignment.Center)
@@ -383,11 +393,7 @@ fun TouchView(onTouch: (x: Float, y: Float) -> Unit, ipAddress: String) {
     }
 }
 
-
-
-
-
-fun Tap(ipAddress: String){
+fun Tap(ipAddress: String) {
 
     val ipAddress = ipAddress // Replace with your server's IP address
     val port = 1234 // Replace with your server's port number
@@ -454,7 +460,6 @@ fun sendCoordinatesToServer(x: Float, y: Float, ipAddress: String) {
     }
 }
 
-
 fun leftClick(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
@@ -484,8 +489,6 @@ fun rightClick(ipAddress: String) {
         }
     }
 }
-
-
 
 private fun showKeyboard(context: android.content.Context, ipAddress: String) {
     // Create an EditText to capture key events
@@ -546,26 +549,37 @@ private fun showKeyboard(context: android.content.Context, ipAddress: String) {
     Log.d("showKeyboard", "showKeyboard")
 }
 
+suspend fun screenshot(ipAddress: String): String? {
+    var fileName: String? = null
 
-
-fun screenshot(ipAddress: String){
-
-    GlobalScope.launch(Dispatchers.IO) {
+    withContext(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
         try {
             val socket = Socket(ipAddress, port)
             val outToServer = DataOutputStream(socket.getOutputStream())
             outToServer.writeUTF("7")
+            // Receive the filename from the server
+            val inputStream = socket.getInputStream()
+            val dataInputStream = DataInputStream(inputStream)
+            fileName = dataInputStream.readUTF()
+
+            // Close the streams and the socket
+            dataInputStream.close()
+            inputStream.close()
             socket.close()
+
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    return fileName
+
 }
 
-fun scrollUp(ipAddress: String){
+fun scrollUp(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
@@ -580,7 +594,7 @@ fun scrollUp(ipAddress: String){
     }
 }
 
-fun scrollDown(ipAddress: String){
+fun scrollDown(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
@@ -595,8 +609,7 @@ fun scrollDown(ipAddress: String){
     }
 }
 
-
-fun desktop(ipAddress: String){
+fun desktop(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
@@ -610,7 +623,8 @@ fun desktop(ipAddress: String){
         }
     }
 }
-fun terminal(ipAddress: String){
+
+fun terminal(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
@@ -624,7 +638,8 @@ fun terminal(ipAddress: String){
         }
     }
 }
-fun notes(ipAddress: String){
+
+fun notes(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
@@ -638,7 +653,8 @@ fun notes(ipAddress: String){
         }
     }
 }
-fun calculator(ipAddress: String){
+
+fun calculator(ipAddress: String) {
     GlobalScope.launch(Dispatchers.IO) {
         val ipAddress = ipAddress
         val port = 1234
