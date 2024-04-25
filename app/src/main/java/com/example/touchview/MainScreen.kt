@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -79,26 +82,47 @@ fun MainScreen(navController: NavHostController) {
                 )
             }
             item {
-                BasicTextField(
-                    value = text,
-                    onValueChange = { newText -> text = newText },
+                LimitedTextField(
+                    value = text.text,
+                    onValueChange = {
+                        if (it.length <= 20) {
+                            text = TextFieldValue(it)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 20.dp, horizontal = 12.dp)
                         .border(
                             width = 2.dp,
-                            color = Color.White, // White border color
+                            color = Color.White,
                             shape = RoundedCornerShape(5.dp)
                         )
                         .padding(horizontal = 10.dp, vertical = 20.dp)
-                        .shadow(20.dp, shape = RoundedCornerShape(4.dp)) // Add shadow
-                        .padding(horizontal = 12.dp), // Adjust padding after applying shadow
+                        .shadow(20.dp, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 12.dp),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White, fontSize = 25.sp)
                 )
             }
         }
         Buttons(navController, context, text.text)
     }
+}
+
+@Composable
+fun LimitedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        textStyle = textStyle,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None) // Disable imeAction
+    )
 }
 
 @Composable
